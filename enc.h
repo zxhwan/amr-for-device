@@ -1,7 +1,7 @@
 
 #ifndef _enc_h_
 #define _enc_h_
-#include "cuda_runtime.h"
+#include "cuda.h"
 #include "typedef.h"
 #include "amrnb_rom.h"
 enum TXFrameType {

@@ -225,10 +225,10 @@ typedef struct {
 * Conversion from packed bitstream to endoded parameters
 * Decoding parameters to speech
 */
-void Decoder_Interface_Decode(dec_interface_State* state, unsigned char *bits, short *synth, int bfi);
+__device__ void Decoder_Interface_Decode(dec_interface_State* state, unsigned char *bits, short *synth, int bfi);
 
 /*
 * Reserve and init. memory
 */
-void Decoder_Interface_init(dec_interface_State* state);
+__device__ void Decoder_Interface_init(dec_interface_State* state);
 #endif

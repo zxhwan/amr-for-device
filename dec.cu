@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <math.h>
+#include <float.h>
 #include "typedef.h"
 #include "dec.h"
 #include "cuda_runtime.h"
@@ -16157,7 +16158,7 @@ __device__ static Word32 Syn_filt(Word32 a[], Word32 x[], Word32 y[], Word32 lg,
 * Returns:
 *    void
 */
-static void Syn_filt_overflow(Word32 a[], Word32 x[], Word32 y[], Word32 lg, Word32 mem[]
+__device__ static void Syn_filt_overflow(Word32 a[], Word32 x[], Word32 y[], Word32 lg, Word32 mem[]
 	, Word32 update)
 {
 	Word32 tmp[50];   /* malloc is slow */
@@ -17015,7 +17016,7 @@ __device__ static void Dec_lag3(Word32 index, Word32 t0_min, Word32 t0_max, Word
 *    n = 0, ...,39, t = 0, ...,5.
 *
 *    The interpolation filter b60 is based on a Hamming windowed sin(x)/x
-*    function truncated at ¡À 59 and padded with zeros at ¡À 60 (b60(60)=0)).
+*    function truncated at \A1\C0 59 and padded with zeros at \A1\C0 60 (b60(60)=0)).
 *    The filter has a cut-off frequency (-3 dB) at 3 600 Hz in
 *    the over-sampled domain.
 *
@@ -20631,7 +20632,7 @@ __device__ enum Mode DecoderMMS(Word16 *param, UWord8 *stream, enum RXFrameType
 
 	memset(param, 0, PRMNO_MR122 << 1);
 	*q_bit = 0x01 & (*stream >> 2);
-	mode = 0x0F & (*stream >> 3);
+	mode = Mode(0x0F & (*stream >> 3));
 	stream++;
 
 	if (mode == MRDTX) {
@@ -20658,8 +20659,8 @@ __device__ enum Mode DecoderMMS(Word16 *param, UWord8 *stream, enum RXFrameType
 		/* *frame_type = RX_SID_UPDATE; */
 
 		/* speech mode indicator */
-		*speech_mode = (*stream >> 4) & 0x07;
-		*speech_mode = ((*speech_mode & 0x0001) << 2) | (*speech_mode & 0x0002) | ((*speech_mode & 0x0004) >> 2);
+		*speech_mode = Mode((*stream >> 4) & 0x07);
+		*speech_mode = Mode(((*speech_mode & 0x0001) << 2) | (*speech_mode & 0x0002) | ((*speech_mode & 0x0004) >> 2));
 
 	}
 	else if (mode == 15) {
@@ -20825,7 +20826,7 @@ __device__ void Decoder_Interface_reset(dec_interface_State *st)
 *    success           : pointer to structure
 *    failure           : NULL
 */
-void Decoder_Interface_init(dec_interface_State* state)
+__device__ void Decoder_Interface_init(dec_interface_State* state)
 {
 	Speech_Decode_Frame_init(&state->decoder_State);
 	Decoder_Interface_reset(state);
@@ -21021,7 +21022,7 @@ __device__ void Decoder_Interface_Decode(dec_interface_State* state, UWord8 *bit
 
 	/* reset decoder if current frame is a homing frame */
 	if (resetFlag == 0) {
-		Speech_Decode_Frame_reset(&state->decoder_State);
+ Speech_Decode_Frame_reset(&state->decoder_State);
 	}
 	state->reset_flag_old = !resetFlag;
 	state->prev_ft = frame_type;
